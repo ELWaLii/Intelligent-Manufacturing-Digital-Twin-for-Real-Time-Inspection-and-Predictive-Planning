@@ -1,0 +1,20 @@
+# --- Edge & Simulators (IoT & Vision) ---
+opencv-python==4.9.0.80
+ultralytics==8.1.0        # YOLOv8 for object detection
+
+# --- Ingestion & Messaging ---
+kafka-python==2.0.2
+
+# --- Data Processing & Machine Learning ---
+pandas==2.2.0
+scikit-learn==1.4.0       # For Anomaly Detection
+xgboost==2.0.3            # For Forecasting and What-If
+
+# --- Backend API (Simulation Engine) ---
+fastapi==0.109.2
+uvicorn[standard]==0.27.1 # ASGI server for FastAPI
+
+# --- Database & Utilities ---
+SQLAlchemy==2.0.25        # ORM for Database interaction
+pyodbc==5.1.0             # Driver for Azure SQL
+python-dotenv==1.0.1      # For loading .env variables securely

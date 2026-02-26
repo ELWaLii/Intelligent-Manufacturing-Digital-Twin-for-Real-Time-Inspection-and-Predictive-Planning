@@ -21,7 +21,10 @@ We employ a modular monorepo strategy to prevent merge conflicts and isolate dom
 ├── 4_simulation_api/        # FastAPI backend for Grafana "What-If" inputs
 ├── 5_database/              # Azure SQL  schemas and queries
 ├── 6_grafana_dashboards/    # Exported Grafana JSON dashboard templates
-└── docs/                    # System architecture 
+└── docs/                    # System architecture
+└── DataSets/                    # Ml Data
+└── Notebooks/                    # Notebooks for EDA And intialize ML models
+
 ## Technology Stack
 Edge/Simulators: Python, OpenCV, Ultralytics (YOLOv8)
 

@@ -1,0 +1,3 @@
+Image Link >>https://www.kaggle.com/datasets/ipythonx/mvtec-ad
+Sensors dataset >> https://github.com/makinarocks/awesome-industrial-machine-datasets/tree/master/data-explanation/CNC%20Mill%20Tool%20Wear#data-download-link
+Producton dataset >> https://archive.ics.uci.edu/dataset/597/productivity+prediction+of+garment+employees

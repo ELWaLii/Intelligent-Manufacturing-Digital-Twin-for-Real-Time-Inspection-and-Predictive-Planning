@@ -1,0 +1,22 @@
+# Python Virtual Environments
+venv/
+env/
+__pycache__/
+*.pyc
+
+# Heavy Image Directories (Keep the folder, ignore the images)
+1_edge_simulators/vision_camera_sim/sample_images/*
+!1_edge_simulators/vision_camera_sim/sample_images/.gitkeep
+1_edge_simulators/vision_camera_sim/alerts_archive/*
+!1_edge_simulators/vision_camera_sim/alerts_archive/.gitkeep
+
+# Deep Learning Models
+*.pt
+*.pth
+*.onnx
+
+# Environment Variables & Secrets
+.env
+
+# OS generated files
+.DS_Store

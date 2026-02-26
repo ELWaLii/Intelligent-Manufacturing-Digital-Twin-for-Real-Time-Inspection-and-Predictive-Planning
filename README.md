@@ -11,7 +11,7 @@ The **Intelligent Manufacturing Digital Twin** is an event-driven, scalable arch
 * **Unified Monitoring Dashboard:** A comprehensive Grafana UI visualizing live sensor data, real-time defect images, and simulation forecasts.
 
 
-
+```text
 ##  Modular Repository Structure
 We employ a modular monorepo strategy to prevent merge conflicts and isolate domain-specific logic:
 

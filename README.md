@@ -23,6 +23,7 @@ We employ a modular monorepo strategy to prevent merge conflicts and isolate dom
 ├── 6_grafana_dashboards/    # Exported Grafana JSON dashboard templates
 └── docs/                    # System architecture
 └── Notebooks/                    # Notebooks for EDA And intialize ML models
+└── Datasets/                    # datasets links
 
 ## Technology Stack
 Edge/Simulators: Python, OpenCV, Ultralytics (YOLOv8)

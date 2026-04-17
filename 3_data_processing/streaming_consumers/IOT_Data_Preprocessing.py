@@ -48,7 +48,7 @@ def create_sequences(data, labels, seq_length):
 seq_length = 10  
 X_time_series, y_wear_stages = create_sequences(X_scaled, wear_stages, seq_length)
 
-print(f"\nشكل الداتا بعد التحويل للـ LSTM: {X_time_series.shape}")
+print(f"\n{X_time_series.shape}")
 
 
 model_lstm = Sequential()

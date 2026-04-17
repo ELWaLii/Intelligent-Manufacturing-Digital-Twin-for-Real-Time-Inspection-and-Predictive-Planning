@@ -9,15 +9,13 @@ import time
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
 
-# ==========================================
-# 0. إعدادات InfluxDB (قم بتعديلها حسب سيرفرك)
-# ==========================================
-INFLUX_URL = "http://localhost:8086"
-INFLUX_TOKEN = "t4Zac1hxXZQvIIfeBCoJLJgxJwWIPDPTknBSl54o1erJHqfG3vPdr0RVZocUGIrfSppVa5nF4gXyKbxEnVJRQA==" # ضع التوكن الخاص بك هنا
-INFLUX_ORG = "kave_org"                   # اسم المنظمة
-INFLUX_BUCKET = "cnc_digital_twin"        # اسم الـ Bucket (قاعدة البيانات)
 
-# الاتصال بـ InfluxDB
+
+INFLUX_URL = "http://localhost:8086"
+INFLUX_TOKEN = "t4Zac1hxXZQvIIfeBCoJLJgxJwWIPDPTknBSl54o1erJHqfG3vPdr0RVZocUGIrfSppVa5nF4gXyKbxEnVJRQA==" 
+INFLUX_ORG = "kave_org"                   
+INFLUX_BUCKET = "cnc_digital_twin"        
+
 client = InfluxDBClient(url=INFLUX_URL, token=INFLUX_TOKEN, org=INFLUX_ORG)
 write_api = client.write_api(write_options=SYNCHRONOUS)
 
@@ -84,24 +82,22 @@ for message in consumer:
             probabilities = model.predict(X_live, verbose=0)[0]
             predicted_stage = int(np.argmax(probabilities)) 
             confidence = float(probabilities[predicted_stage] * 100)
-            # ==========================================
-            # 🚀 إرسال البيانات إلى InfluxDB
-            # ==========================================
+    
             machine_id = live_data.get('machine_id', 'CNC_VIRTUAL_01')
             
-            # إنشاء النقطة (Point) التي سيتم حفظها في الداتابيز
+
             point = (
                 Point("machine_health")
-                .tag("machine_id", machine_id)                     # Tags للفلترة
+                .tag("machine_id", machine_id)                    
                 .tag("process", live_data.get('Machining_Process', 'Unknown'))
-                .field("prediction_stage", predicted_stage)        # حالة الأداة (0 إلى 3)
-                .field("confidence_percent", confidence)           # نسبة الثقة
-                .field("x1_current", float(live_data.get('X1_OutputCurrent', 0))) # تسجيل السنسور لتتبعه
+                .field("prediction_stage", predicted_stage)        
+                .field("confidence_percent", confidence)           
+                .field("x1_current", float(live_data.get('X1_OutputCurrent', 0))) 
                 .field("z1_current", float(live_data.get('Z1_OutputCurrent', 0)))
-                .time(time.time_ns(), WritePrecision.NS)           # الوقت اللحظي
+                .time(time.time_ns(), WritePrecision.NS)           
             )
             
-            # الكتابة في InfluxDB
+           
             write_api.write(bucket=INFLUX_BUCKET, org=INFLUX_ORG, record=point)
    
             if predicted_stage == 3:

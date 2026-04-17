@@ -1,6 +1,5 @@
-
 services:
-  # 1. حاوية كافكا (Kafka) - الجهاز العصبي للبيانات
+
   kave_kafka:
     image: apache/kafka:latest
     container_name: kave_kafka
@@ -20,7 +19,7 @@ services:
       - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
     networks:
       - kave_network
-  # 2. حاوية قاعدة البيانات (PostgreSQL) - ذاكرة النظام
+
   kave_db:
     image: postgres:latest
     container_name: kave_db
@@ -35,9 +34,59 @@ services:
     networks:
       - kave_network
 
+  kave_influx_db:
+    image: influxdb:latest
+    container_name: kave_influx_db
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=kave_pass123 
+      - DOCKER_INFLUXDB_INIT_ORG=kave_org
+      - DOCKER_INFLUXDB_INIT_BUCKET=kave_bucket
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-kave-token
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+      - influxdb_config:/etc/influxdb2
+    networks:
+      - kave_network
+
+  kave_influx_ui:
+    image: influxdata/influxdb3-ui:latest
+    container_name: kave_influx_ui
+    ports:
+      - "8081:8080"
+    environment:
+      - INFLUXDB_URL=http://kave_influx_db:8086
+    depends_on:
+      - kave_influx_db
+    networks:
+      - kave_network
+
+  # --- الإضافة الجديدة: خدمة Grafana ---
+  kave_grafana:
+    image: grafana/grafana:latest
+    container_name: kave_grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - kave_influx_db
+    networks:
+      - kave_network
+
 networks:
   kave_network:
     driver: bridge
 
 volumes:
   postgres_data:
+  influxdb_data:
+  influxdb_config:
+  grafana_data: # تخزين إعدادات الـ Dashboards عشان ما تضيعش لو قفلت الحاوية

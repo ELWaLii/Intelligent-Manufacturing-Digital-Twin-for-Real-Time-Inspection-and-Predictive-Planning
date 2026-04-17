@@ -49,8 +49,14 @@ def generate_row():
     data['clamp_pressure'] = round(random.uniform(2.5, 4.0), 1)
     data['machine_id'] = "CNC_VIRTUAL_01"
     data['event_timestamp'] = time.time()
+    data['Machining_Process'] = random.choice([
+        'Starting', 'Prep', 
+        'Layer 1 Up', 'Layer 1 Down', 
+        'Layer 2 Up', 'Layer 2 Down', 
+        'Layer 3 Up', 'Layer 3 Down'
+    ])
     return data
-
+    
 def save_to_parquet(buffer):
     df_batch = pd.DataFrame(buffer)
     
@@ -71,7 +77,7 @@ try:
         
         
         data_buffer.append(payload)
-        
+        #print(json.dumps(payload, indent=2))
         
         if len(data_buffer) >= batch_size:
             save_to_parquet(data_buffer)

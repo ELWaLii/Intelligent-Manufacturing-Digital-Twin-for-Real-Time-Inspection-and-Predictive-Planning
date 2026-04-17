@@ -1,0 +1,71 @@
+import pandas as pd
+import numpy as np
+import joblib
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Dense, Dropout
+
+df = pd.read_csv("/home/elwali/Graduation_Project/Intelligent-Manufacturing-Digital-Twin-for-Real-Time-Inspection-and-Predictive-Planning/DataSets/Machine_Experiments/Cleaned_MergedData.csv")
+
+cutting_stages = ['Layer 1 Up', 'Layer 1 Down', 'Layer 2 Up', 'Layer 2 Down', 'Layer 3 Up', 'Layer 3 Down']
+df_cutting = df[df['Machining_Process'].isin(cutting_stages)].copy()
+
+features_to_use = ['X1_OutputCurrent', 'Y1_OutputCurrent', 'Z1_OutputCurrent', 'S1_OutputPower']
+
+
+window_size = 10
+for col in features_to_use:
+    df_cutting[f'{col}_std'] = df_cutting[col].rolling(window=window_size).std()
+    df_cutting[f'{col}_rms'] = np.sqrt((df_cutting[col]**2).rolling(window=window_size).mean())
+
+df_cutting.dropna(inplace=True)
+
+features_extracted = [col for col in df_cutting.columns if '_std' in col or '_rms' in col]
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(df_cutting[features_extracted])
+
+
+num_wear_stages = 4
+kmeans = KMeans(n_clusters=num_wear_stages, random_state=42, n_init=10)
+wear_stages = kmeans.fit_predict(X_scaled)
+df_cutting['Wear_Stage'] = wear_stages
+
+
+print(df_cutting['Wear_Stage'].value_counts())
+
+
+def create_sequences(data, labels, seq_length):
+    xs, ys = [], []
+    for i in range(len(data) - seq_length):
+        x = data[i:(i + seq_length)]
+        y = labels[i + seq_length]
+        xs.append(x)
+        ys.append(y)
+    return np.array(xs), np.array(ys)
+
+seq_length = 10  
+X_time_series, y_wear_stages = create_sequences(X_scaled, wear_stages, seq_length)
+
+print(f"\nشكل الداتا بعد التحويل للـ LSTM: {X_time_series.shape}")
+
+
+model_lstm = Sequential()
+model_lstm.add(LSTM(64, return_sequences=True, input_shape=(seq_length, len(features_extracted))))
+model_lstm.add(Dropout(0.2))
+model_lstm.add(LSTM(32))
+model_lstm.add(Dense(num_wear_stages, activation='softmax')) 
+
+model_lstm.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+print("\n Train LSTM...")
+
+model_lstm.fit(X_time_series, y_wear_stages, epochs=10, batch_size=32, validation_split=0.2)
+
+model_lstm.save('cnc_lstm_model.keras') 
+joblib.dump(scaler, 'cnc_scaler.pkl')
+joblib.dump(kmeans, 'cnc_kmeans.pkl')
+joblib.dump(features_extracted, 'model_features.pkl')
+
+print("\nTrain Done")

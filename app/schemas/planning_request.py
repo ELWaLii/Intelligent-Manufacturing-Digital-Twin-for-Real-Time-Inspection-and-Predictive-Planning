@@ -1,39 +1,51 @@
-from datetime import datetime
+from sqlalchemy.orm import Session
+from planning_request import PlanningRequestModel
 
-from pydantic import BaseModel, ConfigDict, Field
+def simulate_and_save_request(db: Session, target_productivity: float, max_allowed_overtime: float, current_machine_stage: int):
+    # 1. حساب تأثير حالة المكنة الحالية (التوأم الرقمي) القادم من الـ LSTM
+    idle_impact = 0.0
+    if current_machine_stage >= 2:
+        idle_impact = 0.35 # انخفاض كفاءة ورفع وقت الفراغ بنسبة 35% بسبب الأعطال
+        
+    # 2. تطبيق منطق الـ What-If المستخلص من داتا الإنتاجية والـ EDA
+    if target_productivity > 0.95:
+        status = "REJECTED"
+        required_incentive = 0.0
+        required_overtime = 0.0
+        idle_impact = 1.0
+        justification = "القرار مرفوض: استهداف إنتاجية أعلى من 95% غير عملي بالمرة ولا يتوافق مع معدلات الأعطال والصيانة التاريخية للمصنع."
+    else:
+        # حساب الحوافز والـ Overtime المطلوبين ديناميكياً
+        required_incentive = (target_productivity * 150) + (idle_impact * 200)
+        required_overtime = (target_productivity * 4000) * (1 + idle_impact)
+        
+        status = "APPROVED"
+        justification = "القرار مقبول تشغيلياً: تم حساب الميزانية المطلوبة وساعات العمل الإضافية للوصول للمستهدف بنجاح."
+        
+        # مراجعة القيود (Constraints)
+        if required_overtime > max_allowed_overtime:
+            status = "WARNING"
+            justification = f"تحذير: ساعات العمل الإضافية المطلوبة ({round(required_overtime)} ساعة) تتخطى السقف المسموح به. يرجى تعديل القيود أو زيادة العمالة."
+            
+        # مراجعة حالة التوأم الرقمي الحرجة
+        if current_machine_stage == 3:
+            status = "REJECTED"
+            justification = "القرار مرفوض قطعيًا: الماكينة الحالية في حالة انهيار تام (Stage 3). خطة زيادة الإنتاج مستحيلة قبل عمل صيانة وتغيير الأداة."
 
-
-class PlanningRequestCreate(BaseModel):
-    product_type: str = Field(min_length=1, max_length=100, examples=["cement_bag"])
-    target_quantity: float = Field(gt=0, examples=[1000])
-    available_workers: int = Field(ge=0, examples=[12])
-    available_raw_material: float | None = Field(default=None, ge=0, examples=[1500])
-    shift_hours: float = Field(gt=0, le=24, examples=[8])
-    planning_date: str | None = Field(default=None, examples=["2026-04-20"])
-    notes: str | None = Field(default=None, max_length=1000, examples=["Priority order"])
-
-
-class PlanningRequestListItem(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    product_type: str
-    target_quantity: float
-    available_workers: int
-    status: str
-    created_at: datetime
-
-
-class PlanningRequestResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    product_type: str
-    target_quantity: float
-    available_workers: int
-    available_raw_material: float | None
-    shift_hours: float
-    planning_date: str | None
-    notes: str | None
-    status: str
-    created_at: datetime
+    # 3. حفظ السيناريو في قاعدة البيانات للأرشفة التاريخية
+    db_record = PlanningRequestModel(
+        target_productivity=target_productivity,
+        max_allowed_overtime=max_allowed_overtime,
+        current_machine_stage=current_machine_stage,
+        decision_status=status,
+        required_incentive=round(required_incentive, 2),
+        required_overtime=round(required_overtime, 2),
+        predicted_idle_impact=round(idle_impact, 2),
+        justification=justification
+    )
+    
+    db.add(db_record)
+    db.commit()
+    db.refresh(db_record)
+    
+    return db_record

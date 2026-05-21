@@ -1,15 +1,15 @@
-from collections.abc import Generator
-
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import sessionmaker
+from config import settings
 
-from app.core.config import settings
+# إنشاء محرك الاتصال
+engine = create_engine(settings.DATABASE_URL)
 
-engine = create_engine(settings.database_url, pool_pre_ping=True)
+# تكوين الجلسات المحلية
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-
-def get_db() -> Generator[Session, None, None]:
+# دالة الـ Dependency لحقن الجلسة في الـ Endpoints وقفلها أوتوماتيكياً
+def get_db():
     db = SessionLocal()
     try:
         yield db

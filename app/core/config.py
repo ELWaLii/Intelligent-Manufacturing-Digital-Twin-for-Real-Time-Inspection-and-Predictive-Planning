@@ -1,16 +1,11 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
-
+import os
+from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    app_name: str = "Smart Factory API"
-    api_v1_prefix: str = "/api/v1"
-    database_url: str = "postgresql+psycopg2://postgres:postgres@localhost:5432/smart_factory"
-
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        case_sensitive=False,
+    # رابط الاتصال بقاعدة بيانات PostgreSQL الموحد في الـ Docker Compose
+    DATABASE_URL: str = os.getenv(
+        "DATABASE_URL", 
+        "postgresql://admin:kave_pass@localhost:5432/kave_db"
     )
-
 
 settings = Settings()

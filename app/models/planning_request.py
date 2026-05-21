@@ -1,25 +1,35 @@
-from datetime import datetime
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from pydantic import BaseModel
+from session import get_db
+import planning_request_service
 
-from sqlalchemy import DateTime, Float, Integer, String, Text, func
-from sqlalchemy.orm import Mapped, mapped_column
+router = APIRouter(prefix="/planning", tags=["What-If Simulation Engine"])
 
-from app.db.base import Base
+# 🏗️ الـ Pydantic Schemas للمدخلات والمخرجات
+class SimulationRequestSchema(BaseModel):
+    target_productivity: float
+    max_allowed_overtime: float
+    current_machine_stage: int
 
+class SimulationResponseSchema(BaseModel):
+    id: int
+    decision_status: str
+    required_incentive: float
+    required_overtime: float
+    predicted_idle_impact: float
+    justification: str
 
-class PlanningRequest(Base):
-    __tablename__ = "planning_requests"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    product_type: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
-    target_quantity: Mapped[float] = mapped_column(Float, nullable=False)
-    available_workers: Mapped[int] = mapped_column(Integer, nullable=False)
-    available_raw_material: Mapped[float | None] = mapped_column(Float, nullable=True)
-    shift_hours: Mapped[float] = mapped_column(Float, nullable=False)
-    planning_date: Mapped[str | None] = mapped_column(String(20), nullable=True)
-    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
-    status: Mapped[str] = mapped_column(String(30), nullable=False, default="pending")
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        nullable=False,
-    )
+# 🚀 الـ Endpoint الأساسي للمحاكاة والتخزين
+@router.post("/simulate", response_model=SimulationResponseSchema)
+def run_simulation(payload: SimulationRequestSchema, db: Session = Depends(get_db)):
+    try:
+        result = planning_request_service.simulate_and_save_request(
+            db=db,
+            target_productivity=payload.target_productivity,
+            max_allowed_overtime=payload.max_allowed_overtime,
+            current_machine_stage=payload.current_machine_stage
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"حدث خطأ داخلي في محرك المحاكاة: {str(e)}")

@@ -1,5 +1,6 @@
-services:
+version: '3.8'
 
+services:
   kave_kafka:
     image: apache/kafka:latest
     container_name: kave_kafka
@@ -12,7 +13,7 @@ services:
       - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
       - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@localhost:9093
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@127.0.0.1:9093  
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
@@ -38,33 +39,20 @@ services:
     image: influxdb:latest
     container_name: kave_influx_db
     ports:
-      - "8086:8086"
+      - "8089:8086" 
     environment:
       - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=admin
       - DOCKER_INFLUXDB_INIT_PASSWORD=kave_pass123 
       - DOCKER_INFLUXDB_INIT_ORG=kave_org
-      - DOCKER_INFLUXDB_INIT_BUCKET=kave_bucket
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-kave-token
+      - DOCKER_INFLUXDB_INIT_BUCKET=cnc_digital_twin
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=t4Zac1hxXZQvIIfeBCoJLJgxJwWIPDPTknBSl54o1erJHqfG3vPdr0RVZocUGIrfSppVa5nF4gXyKbxEnVJRQA==
     volumes:
       - influxdb_data:/var/lib/influxdb2
       - influxdb_config:/etc/influxdb2
     networks:
       - kave_network
 
-  kave_influx_ui:
-    image: influxdata/influxdb3-ui:latest
-    container_name: kave_influx_ui
-    ports:
-      - "8081:8080"
-    environment:
-      - INFLUXDB_URL=http://kave_influx_db:8086
-    depends_on:
-      - kave_influx_db
-    networks:
-      - kave_network
-
-  # --- الإضافة الجديدة: خدمة Grafana ---
   kave_grafana:
     image: grafana/grafana:latest
     container_name: kave_grafana
@@ -89,4 +77,4 @@ volumes:
   postgres_data:
   influxdb_data:
   influxdb_config:
-  grafana_data: # تخزين إعدادات الـ Dashboards عشان ما تضيعش لو قفلت الحاوية
+  grafana_data:

@@ -6,7 +6,6 @@ import planning_request_service
 
 router = APIRouter(prefix="/planning", tags=["What-If Simulation Engine"])
 
-# 🏗️ الـ Pydantic Schemas للمدخلات والمخرجات
 class SimulationRequestSchema(BaseModel):
     target_productivity: float
     max_allowed_overtime: float
@@ -20,7 +19,6 @@ class SimulationResponseSchema(BaseModel):
     predicted_idle_impact: float
     justification: str
 
-# 🚀 الـ Endpoint الأساسي للمحاكاة والتخزين
 @router.post("/simulate", response_model=SimulationResponseSchema)
 def run_simulation(payload: SimulationRequestSchema, db: Session = Depends(get_db)):
     try:

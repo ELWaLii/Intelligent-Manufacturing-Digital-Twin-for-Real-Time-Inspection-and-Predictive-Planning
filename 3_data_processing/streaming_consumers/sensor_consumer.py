@@ -48,7 +48,7 @@ machine_buffers = {}
 
 def machine_consumer_worker(machine_id):
     topic_name = f"cnc_telemetry_{machine_id}"
-    print(f"🚀 Thread started and listening to: {topic_name}")
+    print(f" Thread started and listening to: {topic_name}")
     
     consumer = KafkaConsumer(
         topic_name,
@@ -136,4 +136,4 @@ if __name__ == "__main__":
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        print("\n🛑 Stopping Parallel Consumers Pipeline... Done.")
+        print("\n Stopping Parallel Consumers Pipeline... Done.")

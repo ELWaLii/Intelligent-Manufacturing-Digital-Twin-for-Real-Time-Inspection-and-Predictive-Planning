@@ -2,12 +2,9 @@ from sqlalchemy.orm import Session
 from planning_request import PlanningRequestModel
 
 def simulate_and_save_request(db: Session, target_productivity: float, max_allowed_overtime: float, current_machine_stage: int):
-    # 1. حساب تأثير حالة المكنة الحالية (التوأم الرقمي) القادم من الـ LSTM
     idle_impact = 0.0
     if current_machine_stage >= 2:
-        idle_impact = 0.35 # انخفاض كفاءة ورفع وقت الفراغ بنسبة 35% بسبب الأعطال
-        
-    # 2. تطبيق منطق الـ What-If المستخلص من داتا الإنتاجية والـ EDA
+        idle_impact = 0.35 
     if target_productivity > 0.95:
         status = "REJECTED"
         required_incentive = 0.0
@@ -27,12 +24,10 @@ def simulate_and_save_request(db: Session, target_productivity: float, max_allow
             status = "WARNING"
             justification = f"تحذير: ساعات العمل الإضافية المطلوبة ({round(required_overtime)} ساعة) تتخطى السقف المسموح به. يرجى تعديل القيود أو زيادة العمالة."
             
-        # مراجعة حالة التوأم الرقمي الحرجة
         if current_machine_stage == 3:
             status = "REJECTED"
             justification = "القرار مرفوض قطعيًا: الماكينة الحالية في حالة انهيار تام (Stage 3). خطة زيادة الإنتاج مستحيلة قبل عمل صيانة وتغيير الأداة."
 
-    # 3. حفظ السيناريو في قاعدة البيانات للأرشفة التاريخية
     db_record = PlanningRequestModel(
         target_productivity=target_productivity,
         max_allowed_overtime=max_allowed_overtime,

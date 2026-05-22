@@ -31,7 +31,7 @@ services:
       - POSTGRES_PASSWORD=kave_pass
       - POSTGRES_DB=kave_db
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
     networks:
       - kave_network
 
@@ -62,10 +62,30 @@ services:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+      - GF_PANELS_DISABLE_SANITIZE_HTML=true
     volumes:
       - grafana_data:/var/lib/grafana
     depends_on:
       - kave_influx_db
+      - kave_db
+    networks:
+      - kave_network
+
+  kave_simulator:
+    build:
+      context: ../4_simulation_api   
+      dockerfile: Dockerfile
+    container_name: kave_simulator
+    ports:
+      - "8501:8501"
+    environment:
+      - DB_HOST=kave_db        
+      - DB_PORT=5432
+      - DB_NAME=kave_db
+      - DB_USER=admin
+      - DB_PASSWORD=kave_pass
+    depends_on:
+      - kave_db                   
     networks:
       - kave_network
 

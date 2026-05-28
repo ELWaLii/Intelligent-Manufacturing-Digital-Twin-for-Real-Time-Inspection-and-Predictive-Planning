@@ -1,0 +1,8 @@
+datasets/
+saved_models/
+models/
+alerts_archive/
+sample_images/
+__pycache__/
+venv/
+.env

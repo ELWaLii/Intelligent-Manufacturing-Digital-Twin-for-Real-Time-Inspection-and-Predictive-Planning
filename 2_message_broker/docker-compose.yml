@@ -65,6 +65,8 @@ services:
       - GF_PANELS_DISABLE_SANITIZE_HTML=true
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./grafana_provisioning/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      - ./grafana_provisioning/dashboard.json:/var/lib/grafana/dashboards/dashboard.json
     depends_on:
       - kave_influx_db
       - kave_db

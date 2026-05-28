@@ -34,12 +34,11 @@ sensor_ranges = {
     'S1': {'pos': (-2150, 2150), 'vel': (-0.06, 53.8), 'acc': (-150, 150), 'pwr': (0, 0.56)}
 }
 
-# إعطاء كل مكنة بصمة مختلفة عشان البيانات متبقاش متطابقة
 machine_profiles = {
-    "CNC_VIRTUAL_01": 1.0,   # طبيعي
-    "CNC_VIRTUAL_02": 1.0,   # طبيعي في البداية (هتتغير تحت)
-    "CNC_VIRTUAL_03": 1.35,  # أعلى بنسبة 35%
-    "CNC_VIRTUAL_04": 0.75   # أقل بنسبة 25%
+    "CNC_VIRTUAL_01": 1.0,   
+    "CNC_VIRTUAL_02": 1.0,   
+    "CNC_VIRTUAL_03": 1.35, 
+    "CNC_VIRTUAL_04": 0.75  
 }
 
 def generate_row(machine_id):
@@ -101,29 +100,24 @@ def machine_worker(machine_id):
     
     start_time = time.time()
     
-    # تحويل الـ 4 مراحل لـ 20 ثانية (كل مرحلة 5 ثواني)
     phase_duration = 5 
     
     while not stop_event.is_set():
         try:
             payload = generate_row(machine_id)
             
-            # محاكاة انهيار المكنة الثانية بشكل سريع
             if machine_id == "CNC_VIRTUAL_02":
                 elapsed_time = time.time() - start_time
                 
-                # المرحلة 1 (طبيعي) - من 0 لـ 5 ثواني
                 if elapsed_time <= phase_duration:
                     pass 
                     
-                # المرحلة 2 (تآكل مبدئي) - من 5 لـ 10 ثواني
                 elif elapsed_time <= (phase_duration * 2):
                     payload['X1_OutputCurrent'] = round(random.uniform(420.0, 480.0), 1)
                     payload['Y1_OutputCurrent'] = round(random.uniform(420.0, 480.0), 1)
                     payload['Z1_OutputCurrent'] = round(random.uniform(420.0, 480.0), 1)
                     payload['S1_OutputPower'] = round(random.uniform(1.2, 1.8), 6)
                     
-                # المرحلة 3 (تآكل شديد) - من 10 لـ 15 ثانية
                 elif elapsed_time <= (phase_duration * 3):
                     payload['X1_OutputCurrent'] = round(random.uniform(650.0, 750.0), 1)
                     payload['Y1_OutputCurrent'] = round(random.uniform(650.0, 750.0), 1)
@@ -131,7 +125,6 @@ def machine_worker(machine_id):
                     payload['S1_OutputPower'] = round(random.uniform(2.5, 4.5), 6)
                     payload['clamp_pressure'] = round(random.uniform(0.5, 1.0), 1)
                     
-                # المرحلة 4 (انهيار تام Worn Out) - بعد 15 ثانية وتستمر عليها
                 else:
                     payload['X1_OutputCurrent'] = round(random.uniform(1600.0, 1900.0), 1)
                     payload['Y1_OutputCurrent'] = round(random.uniform(1600.0, 1900.0), 1)

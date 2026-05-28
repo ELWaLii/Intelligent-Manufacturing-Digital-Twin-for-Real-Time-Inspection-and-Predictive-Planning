@@ -179,7 +179,7 @@ if img_base64_str:
 st.sidebar.markdown("<h2 style='text-align: center; color: #007BFF;'>KAVE Navigation Hub</h2>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 
-grafana_url = "http://localhost:3000/goto/afmudlldpckjkf?orgId=1" 
+grafana_url = "http://localhost:3000/goto/bfmwf0dco1pmof?orgId=1" 
 st.sidebar.markdown(f'<a href="{grafana_url}" target="_blank"><button style="width:100%;font-family:sans-serif;font-size:15px;font-weight:bold;color:white;background-color:#E65100;border:none;border-radius:5px;padding:12px;cursor:pointer;">📺 Go to Grafana Live CNC Monitoring</button></a>', unsafe_allow_html=True)
 st.sidebar.markdown("---")
 st.sidebar.info("💡 Hub Info: Use Grafana to monitor physical machines and Streamlit to simulate human resource plans.")

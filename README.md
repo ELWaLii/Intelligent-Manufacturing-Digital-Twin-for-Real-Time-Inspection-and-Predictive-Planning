@@ -12,18 +12,6 @@ The **Intelligent Manufacturing Digital Twin** is an event-driven, scalable arch
 
 
 ```text
-##  Modular Repository Structure
-We employ a modular monorepo strategy to prevent merge conflicts and isolate domain-specific logic:
-
-├── 1_edge_simulators/       # Python scripts simulating IoT sensors & Industrial Cameras
-├── 2_message_broker/        # Dockerized Apache Kafka infrastructure
-├── 3_data_processing/       # Kafka Consumers & ML Inference (Scikit-Learn/XGBoost)
-├── 4_simulation_api/        # FastAPI backend for Grafana "What-If" inputs
-├── 5_database/              # Azure SQL  schemas and queries
-├── 6_grafana_dashboards/    # Exported Grafana JSON dashboard templates
-└── docs/                    # System architecture
-└── Notebooks/                    # Notebooks for EDA And intialize ML models
-└── Datasets/                    # datasets links
 
 ## Technology Stack
 Edge/Simulators: Python, OpenCV, Ultralytics (YOLOv8)

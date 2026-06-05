@@ -1,0 +1,6 @@
+*.pt 
+data/ 
+*.pt 
+*.onnx 
+*.pkl 
+*.zip 

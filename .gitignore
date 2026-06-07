@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Python Virtual Environments
 venv/
 env/
@@ -22,3 +23,11 @@ __pycache__/
 .DS_Store
 DataSets/Machine_Experiments/
 DataSets/Production_Dataset/
+=======
+*.pt 
+data/ 
+*.pt 
+*.onnx 
+*.pkl 
+*.zip 
+>>>>>>> d4abe0428842d3ba6ba53154a5a37f917e468e6f

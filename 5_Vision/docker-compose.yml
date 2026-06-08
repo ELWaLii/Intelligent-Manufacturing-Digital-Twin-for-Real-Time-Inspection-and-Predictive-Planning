@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  redis-broker:
+    image: redis:7-alpine
+    container_name: redis_message_broker
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./2_message_broker/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      - vision-network
+    restart: always
+
+networks:
+  vision-network:
+    driver: bridge

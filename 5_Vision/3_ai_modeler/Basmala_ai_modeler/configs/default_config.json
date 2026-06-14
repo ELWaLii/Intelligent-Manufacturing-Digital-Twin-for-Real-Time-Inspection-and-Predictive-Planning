@@ -1,0 +1,17 @@
+{
+  "image_size": 256,
+  "center_crop": 224,
+  "batch_size": 32,
+  "num_workers": 4,
+  "epochs": 1,
+  "lr": 0.001,
+  "backbone": "wide_resnet50_2",
+  "anomaly_categories": [
+    "bent",
+    "color",
+    "flip",
+    "scratch"
+  ],
+  "seed": 42,
+  "device": "cuda"
+}

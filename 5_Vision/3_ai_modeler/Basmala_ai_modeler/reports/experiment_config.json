@@ -1,0 +1,59 @@
+{
+  "experiment_id": "metal_nut_1780544491",
+  "dataset": "MVTec AD \u2014 metal_nut",
+  "seed": 42,
+  "device": "cuda",
+  "models_trained": [
+    "PatchCore",
+    "PaDiM"
+  ],
+  "best_model": "Ensemble: Max Score",
+  "best_threshold": 0.23386003358641527,
+  "optuna_best_params": {
+    "coreset_ratio": 0.03927975767245621,
+    "k": 10
+  },
+  "metrics": {
+    "PatchCore": {
+      "Image AUROC": 0.9628543499511241,
+      "Image AUPRC": 0.9923573924912906,
+      "F1": 0.9550561797752809,
+      "Precision": 1.0,
+      "Recall": 0.9139784946236559,
+      "Accuracy": 0.9304347826086956,
+      "threshold": 3.265194498288216,
+      "Pixel AUROC": 0.8815759229380605,
+      "Pixel AUPRC": 0.4305370156633456,
+      "IoU": 0.3536867802174729,
+      "Dice": 0.5225533489521886
+    },
+    "PaDiM": {
+      "Image AUROC": 0.9687194525904204,
+      "Image AUPRC": 0.9922733530760836,
+      "F1": 0.9787234042553191,
+      "Precision": 0.968421052631579,
+      "Recall": 0.989247311827957,
+      "Accuracy": 0.9652173913043478,
+      "threshold": 8.703558830802125,
+      "Pixel AUROC": 0.8622142661010989,
+      "Pixel AUPRC": 0.3333628766286701,
+      "IoU": 0.2773146325530266,
+      "Dice": 0.4342150719729019
+    }
+  },
+  "preprocessing": {
+    "image_size": 256,
+    "crop_size": 224,
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ]
+  },
+  "augmentation": "HFlip,VFlip,Rotate180,SSR,BrightnessContrast,GaussNoise,Blur,CLAHE,ColorJitter"
+}

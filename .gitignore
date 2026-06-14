@@ -1,0 +1,17 @@
+# Ignore models and checkpoints
+checkpoints/
+exports/
+*.npy
+*.pt
+*.onnx
+*.data
+
+# Ignore datasets
+data/
+*.zip
+
+# Ignore python cache and logs
+__pycache__/
+logs/
+outputs/
+.ipynb_checkpoints/

@@ -1,0 +1,29 @@
+apiVersion: 1
+datasources:
+  - name: InfluxDB
+    type: influxdb
+    uid: influxdb
+    access: proxy
+    url: http://kave_influx_db:8086
+    jsonData:
+      version: Flux
+      organization: kave_org
+      defaultBucket: cnc_digital_twin
+    secureJsonData:
+      token: t4Zac1hxXZQvIIfeBCoJLJgxJwWIPDPTknBSl54o1erJHqfG3vPdr0RVZocUGIrfSppVa5nF4gXyKbxEnVJRQA==
+    isDefault: true
+
+  - name: PostgreSQL
+    type: postgres
+    uid: postgres
+    access: proxy
+    url: kave_db:5432
+    user: admin
+    jsonData:
+      database: kave_db
+      sslmode: disable
+      maxOpenConns: 10
+      maxIdleConns: 5
+      connMaxLifetime: 14400
+    secureJsonData:
+      password: kave_pass

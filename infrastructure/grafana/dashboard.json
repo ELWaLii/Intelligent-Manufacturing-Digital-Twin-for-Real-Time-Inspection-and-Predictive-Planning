@@ -1,0 +1,594 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "liveNow": true,
+  "panels": [
+    {
+      "datasource": null,
+      "gridPos": { "h": 3, "w": 20, "x": 0, "y": 0 },
+      "id": 1,
+      "uid": "panel-1",
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<div style=\"display: flex; justify-content: space-between; align-items: center; padding: 10px; background: linear-gradient(90deg, #0B101E 0%, #151E32 100%); border-radius: 10px; border: 1px solid #007BFF;\">\n    <div style=\"display: flex; align-items: center; gap: 15px;\">\n        <h1 style=\"color: #007BFF; margin: 0; font-family: sans-serif; font-weight: 900; letter-spacing: 2px;\">KAVE</h1>\n        <div style=\"height: 40px; width: 2px; background-color: #333;\"></div>\n        <div>\n            <h4 style=\"color: #E6edf3; margin: 0; font-family: sans-serif;\">CNC Digital Twin Monitor</h4>\n            <span style=\"color: #888; font-size: 12px; font-style: italic;\">Data Thinks. System  Acts.</span>\n        </div>\n    </div>\n    <div style=\"display: flex; align-items: center; gap: 8px; background-color: rgba(255, 59, 48, 0.1); padding: 5px 15px; border-radius: 20px; border: 1px solid rgba(255, 59, 48, 0.3);\">\n        <div style=\"width: 10px; height: 10px; background-color: #FF3B30; border-radius: 50%; box-shadow: 0 0 10px #FF3B30; animation: blink 1s infinite;\"></div>\n        <span style=\"color: #FF3B30; font-weight: bold; font-family: monospace; letter-spacing: 1px;\">LIVE STREAM</span>\n    </div>\n    <style>\n        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }\n    </style>\n</div>",
+        "mode": "html"
+      },
+      "title": "",
+      "type": "text",
+      "transparent": true
+    },
+
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "gridPos": { "h": 3, "w": 4, "x": 20, "y": 0 },
+      "id": 7,
+      "uid": "panel-7",
+      "title": "Pipeline Status",
+      "type": "stat",
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb" },
+          "query": "from(bucket: \"cnc_digital_twin\")\n  |> range(start: -15s)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"machine_health\")\n  |> filter(fn: (r) => r[\"_field\"] == \"prediction_stage\")\n  |> group()\n  |> count()",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            {
+              "options": {
+                "from": 1,
+                "to": 10000000000000000,
+                "result": { "color": "green", "index": 0, "text": "ONLINE" }
+              },
+              "type": "range"
+            },
+            {
+              "options": {
+                "match": "null",
+                "result": { "color": "red", "index": 1, "text": "OFFLINE" }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 80 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      }
+    },
+
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 3 },
+      "id": 8,
+      "uid": "panel-8",
+      "title": "Overall Equipment Effectiveness (OEE)",
+      "type": "stat",
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb" },
+          "query": "from(bucket: \"cnc_digital_twin\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"machine_health\")\n  |> filter(fn: (r) => r[\"_field\"] == \"confidence_percent\")\n  |> group()\n  |> aggregateWindow(every: 10s, fn: mean, createEmpty: false)\n  |> yield(name: \"mean\")",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 50 },
+              { "color": "green", "value": 80 }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      }
+    },
+
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "gridPos": { "h": 5, "w": 7, "x": 6, "y": 3 },
+      "id": 10,
+      "uid": "panel-10",
+      "title": "Active Anomalies",
+      "type": "stat",
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb" },
+          "query": "from(bucket: \"cnc_digital_twin\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"machine_health\")\n  |> filter(fn: (r) => r[\"_field\"] == \"prediction_stage\")\n  |> filter(fn: (r) => r._value >= 2)\n  |> group()\n  |> aggregateWindow(every: 10s, fn: count, createEmpty: false)\n  |> yield(name: \"count\")",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      }
+    },
+
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "gridPos": { "h": 5, "w": 6, "x": 13, "y": 3 },
+      "id": 11,
+      "uid": "panel-11",
+      "title": "Defect Rate",
+      "type": "stat",
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb" },
+          "query": "from(bucket: \"cnc_digital_twin\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"machine_health\")\n  |> filter(fn: (r) => r[\"_field\"] == \"confidence_percent\")\n  |> group()\n  |> aggregateWindow(every: 10s, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({ r with _value: 100.0 - r._value }))\n  |> yield(name: \"mean\")",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 30 }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      }
+    },
+
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "gridPos": { "h": 5, "w": 5, "x": 19, "y": 3 },
+      "id": 9,
+      "uid": "panel-9",
+      "title": "Production Rate (units/hr)",
+      "type": "stat",
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb" },
+          "query": "from(bucket: \"cnc_digital_twin\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"machine_health\")\n  |> filter(fn: (r) => r[\"_field\"] == \"x1_current\")\n  |> group()\n  |> aggregateWindow(every: 10s, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({ r with _value: r._value * 15.5 }))\n  |> yield(name: \"mean\")",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 50 },
+              { "color": "green", "value": 80 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      }
+    },
+
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "gridPos": { "h": 6, "w": 10, "x": 0, "y": 8 },
+      "id": 3,
+      "uid": "panel-3",
+      "title": "X1 Current Trend",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb" },
+          "query": "from(bucket: \"cnc_digital_twin\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"machine_health\")\n  |> filter(fn: (r) => r[\"_field\"] == \"x1_current\")\n  |> group(columns: [\"machine_id\"])\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"mean\")",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": { "type": "linear" },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": { "group": "A", "mode": "none" },
+            "thresholdsStyle": { "mode": "off" }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 80 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "sortBy": "Name",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      }
+    },
+
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "gridPos": { "h": 6, "w": 14, "x": 10, "y": 8 },
+      "id": 4,
+      "uid": "panel-4",
+      "title": "AI Wear Stage",
+      "type": "stat",
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb" },
+          "query": "from(bucket: \"cnc_digital_twin\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"machine_health\")\n  |> filter(fn: (r) => r[\"_field\"] == \"prediction_stage\")\n  |> group(columns: [\"machine_id\"]) \n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "displayName": "${__field.labels.machine_id}",
+          "mappings": [
+            {
+              "options": {
+                "0": { "index": 0, "text": "Healthy" },
+                "1": { "index": 1, "text": "Initial Wear" },
+                "2": { "index": 2, "text": "Severe Wear" },
+                "3": { "index": 3, "text": "WORN OUT" }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "orange", "value": 2 },
+              { "color": "red", "value": 3 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      }
+    },
+
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "gridPos": { "h": 6, "w": 15, "x": 0, "y": 14 },
+      "id": 2,
+      "uid": "panel-2",
+      "title": "Machine Failure Probability",
+      "type": "bargauge",
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb" },
+          "query": "from(bucket: \"cnc_digital_twin\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"machine_health\")\n  |> filter(fn: (r) => r[\"_field\"] == \"prediction_stage\")\n  |> group(columns: [\"machine_id\"])\n  |> last()\n  |> map(fn: (r) => ({ r with _value: float(v: r._value) * 33.33 }))",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "displayName": "${__field.labels.machine_id}",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 60 },
+              { "color": "orange", "value": 70 },
+              { "color": "red", "value": 80 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      }
+    },
+
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "gridPos": { "h": 6, "w": 9, "x": 15, "y": 14 },
+      "id": 5,
+      "uid": "panel-5",
+      "title": "Live Alerts Table",
+      "type": "table",
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb" },
+          "query": "from(bucket: \"cnc_digital_twin\")\n  |> range(start: -2h)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"machine_health\")\n  |> filter(fn: (r) => r[\"_field\"] == \"prediction_stage\")\n  |> filter(fn: (r) => r._value >= 2)\n  |> group(columns: [\"machine_id\"])\n  |> keep(columns: [\"_time\", \"machine_id\", \"_value\"])\n  |> sort(columns: [\"_time\"], desc: true)",
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {}
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "align": "auto",
+            "cellOptions": { "type": "auto" },
+            "footer": { "reducers": [] },
+            "inspect": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "2": { "color": "yellow", "index": 0, "text": "Severe Wear" },
+                "3": { "color": "red", "index": 1, "text": "WORN OUT" }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      }
+    },
+
+    {
+      "datasource": { "type": "postgres", "uid": "postgres" },
+      "gridPos": { "h": 8, "w": 11, "x": 0, "y": 20 },
+      "id": 12,
+      "uid": "panel-12",
+      "title": "What-If",
+      "type": "bargauge",
+      "targets": [
+        {
+          "datasource": { "type": "postgres", "uid": "postgres" },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT \n  (targeted_productivity * 100) AS \"Target\", \n  (predicted_productivity * 100) AS \"Predicted\"\nFROM production_scenarios\nORDER BY created_at DESC\nLIMIT 1;",
+          "refId": "A",
+          "sql": {
+            "columns": [{ "parameters": [], "type": "function" }],
+            "groupBy": [{ "property": { "type": "string" }, "type": "groupBy" }],
+            "limit": 50
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 80 }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {
+        "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      }
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": ["cnc", "digital-twin", "kave"],
+  "templating": { "list": [] },
+  "time": { "from": "now-30m", "to": "now" },
+  "timepicker": {
+    "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"]
+  },
+  "timezone": "browser",
+  "title": "KAVE_Monitor",
+  "uid": "dwh-analytics",
+  "version": 3
+}

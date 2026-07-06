@@ -1,6 +1,0 @@
-streamlit
-xgboost
-pandas
-scikit-learn
-psycopg2-binary
-joblib

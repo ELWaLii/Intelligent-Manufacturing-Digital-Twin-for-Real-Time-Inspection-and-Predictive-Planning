@@ -24,8 +24,8 @@ exports/
 data/
 *.zip
 *.data
-DataSets/Machine_Experiments/
-DataSets/Production_Dataset/
+datasets/raw_sensor_data/
+datasets/Production_Dataset/
 
 # ==========================================
 # Logs & Outputs

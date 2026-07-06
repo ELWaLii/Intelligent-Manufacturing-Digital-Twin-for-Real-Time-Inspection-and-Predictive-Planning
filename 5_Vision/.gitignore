@@ -1,7 +1,0 @@
-datasets/
-saved_models/
-models/
-sample_images/
-__pycache__/
-venv/
-.env

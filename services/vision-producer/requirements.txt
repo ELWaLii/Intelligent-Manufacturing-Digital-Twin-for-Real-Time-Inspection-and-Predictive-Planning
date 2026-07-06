@@ -1,0 +1,6 @@
+# ── KAVE Vision Producer Dependencies ────────────────────
+# Edge Camera Simulator — streams images to Redis
+redis==5.3.0
+numpy==1.26.4
+opencv-python-headless==4.11.0.86
+Pillow==11.2.1

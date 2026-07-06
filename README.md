@@ -79,5 +79,13 @@ docker compose up -d --build
 
 ### 4. Access the Dashboards
 - **Master Streamlit Dashboard:** [http://localhost:8501](http://localhost:8501)
+
+-  ## Contributors
+Eng / Mostafa Ashraf WaliAllah
+Eng / Basmala AbuElhamd Mahmmud
+Eng / Ibrahim Yussif Mahmmud
+Eng / Ola Alaa Mohammed
+Eng / Mahammed Hamed Ibrahim
+Eng / Mahmmud Mohammed Qotb
 - **Grafana IoT Analytics:** [http://localhost:3000](http://localhost:3000)
 - **Vision Engine API Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)

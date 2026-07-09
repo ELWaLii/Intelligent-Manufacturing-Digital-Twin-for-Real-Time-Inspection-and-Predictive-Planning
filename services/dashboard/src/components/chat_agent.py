@@ -1,17 +1,13 @@
 import os
 import streamlit as st
 
-# Load .env as fallback for local development (Docker injects env vars directly)
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass  # python-dotenv not installed — rely on OS/Docker env vars
+from dotenv import load_dotenv
+load_dotenv()
 
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
 from langchain_community.utilities import SQLDatabase
 from langchain_core.tools import tool
-from langchain.agents import AgentExecutor, create_tool_calling_agent
+from langchain_classic.agents import AgentExecutor, create_tool_calling_agent
 from langchain_core.prompts import ChatPromptTemplate
 from influxdb_client import InfluxDBClient
 
@@ -95,51 +91,57 @@ def get_agent():
         AgentExecutor: The configured Langchain agent executor, or None if
             initialization fails (e.g. missing API key).
     """
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if not api_key:
-        st.error("GEMINI_API_KEY environment variable not found. Please set it in your .env file.")
+    api_token = os.environ.get("HUGGINGFACEHUB_API_TOKEN")
+    if not api_token:
+        st.error("HUGGINGFACEHUB_API_TOKEN environment variable not found. Please set it in your .env file.")
         return None
 
     try:
-        llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=api_key, temperature=0)
-        # We can attempt a dummy call or just trust it. If it fails on generation, we might need a fallback.
-        # But initialization validates the model if the library tries to fetch model info.
+        llm = HuggingFaceEndpoint(
+            repo_id="Qwen/Qwen2.5-7B-Instruct",
+            task="text-generation",
+            max_new_tokens=1024,
+            temperature=0.1,
+            huggingfacehub_api_token=api_token
+        )
+        chat_model = ChatHuggingFace(llm=llm)
     except Exception as e:
-        st.warning(f"Failed to initialize gemini-1.5-flash. Error: {e}")
-        try:
-            llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=api_key, temperature=0)
-        except Exception as e_fallback:
-            st.error(f"Failed to initialize Gemini fallback: {e_fallback}")
-            return None
+        st.error(f"Failed to initialize Hugging Face model. Error: {e}")
+        return None
 
     tools = [query_postgresql, get_postgres_schema, query_influxdb, get_influx_schema]
 
     prompt = ChatPromptTemplate.from_messages([
         ("system", "You are an Elite Senior Data Engineer AI for KAVE Intelligent Manufacturing. "
-                   "You answer questions using PostgreSQL (for business, defect logs, planning) "
-                   "and InfluxDB (for live CNC sensor, machine wear, and real-time streams). "
+                   "You MUST use your tools SILENTLY to fetch data. DO NOT explain your thought process. "
+                   "DO NOT output raw SQL queries or Flux queries to the user. "
+                   "DO NOT write phrases like 'I will execute this query now' or 'Let me check'. "
+                   "NEVER output raw function calls like `query_postgresql(...)` to the user. "
+                   "Simply observe the tool's result internally and provide ONLY the final, concise, human-readable answer.\n"
                    "ALWAYS follow these rules:\n"
                    "1. Your tone must be strictly professional, technical, direct, and concise.\n"
                    "2. Do NOT use casual filler language, emojis, or unnecessary emotional phrasing.\n"
-                   "3. If you need to write SQL, use the query_postgresql tool. If you need to write Flux, use the query_influxdb tool.\n"
-                   "   - Use query_postgresql to interact with business tables like 'production_scenarios' or 'defect_logs'.\n"
-                   "   - Use query_influxdb to interact with the 'cnc_digital_twin' bucket for live sensors.\n"
-                   "4. Use the schema tools to understand the data structures before querying.\n"
-                   "   - Call get_postgres_schema to see available PostgreSQL tables and columns.\n"
-                   "   - Call get_influx_schema to see available InfluxDB measurements.\n"
-                   "5. When providing a final answer, be precise and data-driven.\n"
-                   "Execute the analytical request efficiently."),
+                   "3. Use query_postgresql to interact with business tables like 'production_scenarios' or 'defect_logs'.\n"
+                   "4. Use query_influxdb to interact with the 'cnc_digital_twin' bucket for live sensors.\n"
+                   "5. Use schema tools (get_postgres_schema, get_influx_schema) to understand structures before querying.\n"
+                   "6. Execute analytical requests efficiently and return ONLY the final synthesized data-driven answer."),
         ("human", "{input}"),
         ("placeholder", "{agent_scratchpad}"),
     ])
 
-    agent = create_tool_calling_agent(llm, tools, prompt)
-    return AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
+    agent = create_tool_calling_agent(chat_model, tools, prompt)
+    return AgentExecutor(
+        agent=agent, 
+        tools=tools, 
+        verbose=False, 
+        handle_parsing_errors=True,
+        return_intermediate_steps=False
+    )
 
 def render_chatbot():
     """Renders the Chatbot UI in Streamlit."""
     st.markdown("### KAVE Intelligence Engine")
-    st.markdown("Dual-Database AI Agent (Powered by Gemini 1.5 Flash): PostgreSQL & InfluxDB. Enter query parameters below.")
+    st.markdown("Dual-Database AI Agent (Powered by Qwen 2.5 - Hugging Face): PostgreSQL & InfluxDB. Enter query parameters below.")
     
     if "messages" not in st.session_state:
         st.session_state.messages = []

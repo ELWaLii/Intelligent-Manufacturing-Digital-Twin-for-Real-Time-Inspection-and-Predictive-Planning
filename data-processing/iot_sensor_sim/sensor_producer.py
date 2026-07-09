@@ -162,6 +162,8 @@ def save_to_parquet(buffer_to_save):
         return
     try:
         df_batch = pd.DataFrame(list(buffer_to_save))
+        df_batch['machine_id'] = df_batch['machine_id'].astype(str)
+        df_batch['Machining_Process'] = df_batch['Machining_Process'].astype(str)
         new_table = pa.Table.from_pandas(df_batch)
 
         with buffer_lock:

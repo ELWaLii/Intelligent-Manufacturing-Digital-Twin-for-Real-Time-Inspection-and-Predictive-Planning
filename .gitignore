@@ -27,6 +27,7 @@ data/
 datasets/raw_sensor_data/
 datasets/Production_Dataset/
 
+data-processing\ai_training\vision_model_training\metal_nut
 # ==========================================
 # Logs & Outputs
 # ==========================================
@@ -46,3 +47,4 @@ outputs/
 # ==========================================
 .env
 .DS_Store
+.env.example

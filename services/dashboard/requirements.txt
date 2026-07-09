@@ -10,10 +10,12 @@ scikit-learn==1.6.1
 joblib==1.4.2
 Pillow==11.2.1
 requests==2.32.3
-langchain>=0.2.0
-langchain-community>=0.2.0
-langchain-core>=0.2.0
-langchain-google-genai>=1.0.5
+langchain
+langchain-community
+langchain-core
+langchain-classic
+langchain-huggingface
+huggingface_hub
 sqlalchemy==2.0.29
 influxdb-client==1.36.1
 python-dotenv>=1.0.0

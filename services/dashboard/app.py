@@ -144,7 +144,7 @@ with main_tab3:
 st.markdown(
     '<div class="kave-footer">'
     'KAVE Intelligent Manufacturing Platform v3.0 &mdash; '
-    'Powered by XGBoost, PaDiM &amp; PatchCore Dual-Pipeline (WideResNet-50-2), Gemini 1.5 Flash, Redis, InfluxDB &amp; PostgreSQL'
+    'Powered by XGBoost, PaDiM &amp; PatchCore Dual-Pipeline (WideResNet-50-2), Qwen 2.5 (Hugging Face), Redis, InfluxDB &amp; PostgreSQL'
     '</div>',
     unsafe_allow_html=True,
 )

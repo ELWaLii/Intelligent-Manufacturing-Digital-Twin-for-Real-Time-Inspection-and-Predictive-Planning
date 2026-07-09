@@ -160,7 +160,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 120s
+      start_period: 300s
 
   kave_vision_producer:
     build:
@@ -192,6 +192,7 @@ services:
       - REDIS_HOST=kave_redis
       - VISION_API_URL=http://kave_vision_engine:8000
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - HUGGINGFACEHUB_API_TOKEN=${HUGGINGFACEHUB_API_TOKEN}
       - INFLUX_TOKEN=${INFLUX_TOKEN:-t4Zac1hxXZQvIIfeBCoJLJgxJwWIPDPTknBSl54o1erJHqfG3vPdr0RVZocUGIrfSppVa5nF4gXyKbxEnVJRQA==}
       - DOCKER_INFLUXDB_INIT_ORG=${DOCKER_INFLUXDB_INIT_ORG:-kave_org}
     volumes:
@@ -200,8 +201,6 @@ services:
       kave_db:
         condition: service_healthy
       kave_redis:
-        condition: service_healthy
-      kave_vision_engine:
         condition: service_healthy
     networks:
       - kave_network
@@ -214,6 +213,8 @@ services:
 networks:
   kave_network:
     driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1400
 
 volumes:
   postgres_data:

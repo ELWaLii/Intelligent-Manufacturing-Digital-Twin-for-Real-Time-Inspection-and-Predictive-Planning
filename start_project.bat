@@ -36,7 +36,7 @@ echo.
 REM ── Step 2: Start Docker Infrastructure ──────────────────────────────────
 echo [2/5] Starting KAVE Docker Infrastructure...
 echo.
-
+docker compose up -d
 if %ERRORLEVEL% NEQ 0 (
     echo.
     echo  ERROR: Docker Compose failed to start!

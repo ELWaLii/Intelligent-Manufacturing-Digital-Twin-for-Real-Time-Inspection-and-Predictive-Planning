@@ -26,6 +26,8 @@ data/
 *.data
 datasets/raw_sensor_data/
 datasets/Production_Dataset/
+services\vision-producer\sample_image\*
+!services\vision-producer\sample_image\.gitkeep
 
 data-processing\ai_training\vision_model_training\metal_nut
 # ==========================================
